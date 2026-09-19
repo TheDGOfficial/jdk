@@ -1,0 +1,71 @@
+name: Build jdk
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-26.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            openjdk-26-jdk \
+            gcc-16 \
+            g++-16 \
+            autoconf \
+            make \
+            zip \
+            unzip \
+            cpio \
+            libfontconfig1-dev \
+            libfreetype6-dev \
+            libasound2-dev \
+            libcups2-dev \
+            libx11-dev \
+            libxext-dev \
+            libxrender-dev \
+            libxrandr-dev \
+            libxtst-dev \
+            libxt-dev \
+            libxi-dev \
+            libxinerama-dev \
+            libxfixes-dev \
+            libxdamage-dev \
+            libxcomposite-dev \
+            libxkbfile-dev \
+            libwayland-dev \
+            wayland-protocols \
+            pkg-config
+
+      - name: Configure bootstrap JDK
+        run: |
+          echo "JAVA_HOME=/usr/lib/jvm/java-26-openjdk-amd64" >> "$GITHUB_ENV"
+          echo "PATH=/usr/lib/jvm/java-26-openjdk-amd64/bin:$PATH" >> "$GITHUB_ENV"
+
+      - name: Clone OpenJDK
+        run: |
+          git clone --depth 1 https://github.com/openjdk/jdk.git openjdk
+
+      - name: Build
+        run: |
+          cd openjdk
+          cp ../build_jdk.sh build_jdk.sh
+          chmod +x build_jdk.sh
+
+          export CC=gcc-16
+          export CXX=g++-16
+
+          ./build_jdk.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: openjdk-linux-x86_64
+          path: |
+            openjdk/build/linux-x86_64-normal-server-release/images/j2re-image
