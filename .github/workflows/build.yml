@@ -55,13 +55,13 @@ jobs:
       - name: Build
         run: |
           cd openjdk
-          cp ../build_jdk.sh build_jdk.sh
-          chmod +x build_jdk.sh
+          cp ../build-jdk.sh build-jdk.sh
+          chmod +x build-jdk.sh
 
           export CC=gcc-16
           export CXX=g++-16
 
-          ./build_jdk.sh
+          ./build-jdk.sh
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
